@@ -267,6 +267,12 @@ void jq_util_input_add_input(jq_util_input_state *state, const char *fname) {
   state->files[state->nfiles++] = jv_mem_strdup(fname);
 }
 
+void jq_util_input_set_input_file(jq_util_input_state *state, FILE *f) {
+    /* need to exam side effects of this */
+    state->files = jv_mem_realloc(state->files, (state->nfiles + 1) * sizeof(state->files[0]));
+    state->current_input = f;
+}
+
 int jq_util_input_errors(jq_util_input_state *state) {
   return state->failures;
 }
