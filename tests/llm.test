@@ -1,31 +1,35 @@
 
+########## Env Vars ##########
+
+
+
 ########## Model Creation ##########
 
 # llm_model
-llm_model("tests/models/stories15M.bin").path == env.PWD + "/tests/models/stories15M.bin"
+llm_model("stories15M.bin").path == env.PWD + "/tests/models/stories15M.bin"
 null
 true
 
-llm_model("tests/models/stories15M.bin").name == "stories15M"
+llm_model("stories15M.bin").name == "stories15M"
 null
 true
 
 # Params: note that steps is set by the user and the rest are defaults
-llm_model("tests/models/stories15M.bin"; {"steps": 200}).params
+llm_model("stories15M.bin"; {"steps": 200}).params
 null
 { "temperature": 1, "topp": 0.9, "steps": 200, "rng_seed": 0}
 
 ########## LLAMA2C ##########
 
-[.[] | llm_tokenize("tests/models/tokenizer.bin"; 32000)]
+[.[] | llm_tokenize("tokenizer.bin"; 32000)]
 ["I believe the meaning of life is"]
 [[1,306,4658,278,6593,310,2834,338]]
 
-[.[] | llm_tokenize("tests/models/tokenizer.bin"; 32000)]
+[.[] | llm_tokenize("tokenizer.bin"; 32000)]
 ["Simply put, the theory of relativity states that "]
 [[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
 
-[.[] | llm_embed("tests/models/tokenizer.bin"; 32000)]
+[.[] | llm_embed("tokenizer.bin"; 32000)]
 ["Simply put, the theory of relativity states that "]
 [[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
 
@@ -38,7 +42,7 @@ null
 
 # llm_getconfig
 
-[.[] | llm_getconfig | .config.env.JQLLM_TESTVAR1]
-["lorem isum"]
-["value1"]
+llm_getconfig | .env.JQLLM_TESTVAR1
+null
+"value1"
 
