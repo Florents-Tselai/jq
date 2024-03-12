@@ -47,6 +47,7 @@ void *alloca (size_t);
 #include "jv_dtoa_tsd.h"
 #include "jv_private.h"
 #include "util.h"
+#include "jqllm.h"
 
 
 #define BINOP(name) \
@@ -1683,6 +1684,55 @@ static jv f_current_line(jq_state *jq, jv a) {
   return jq_util_input_get_current_line(jq);
 }
 
+
+static jv f_llm_tokenize(jq_state *jq, jv input, jv a, jv b) {
+    if (jv_get_kind(input) != JV_KIND_STRING)
+        return type_error(a, "llm_tokenize requires string input");
+
+    jv ret;
+
+    ret = llm_tokenize(input, a, b);
+    jv_free(a);
+    return ret;
+}
+
+static jv f_llm_embed(jq_state *jq, jv input, jv a, jv b) {
+    return llm_embed(input, a, b);
+}
+
+static jv f_llm_generate(jq_state *jq, jv a) {
+    if (jv_get_kind(a) != JV_KIND_STRING)
+        return type_error(a, "llm_generate requires string input");
+
+    jv ret;
+
+    ret = llm_generate(a);
+    jv_free(a);
+    return ret;
+}
+
+static jv f_llm_getconfig(jq_state *jq, jv a) {
+
+    jv ret;
+
+    ret = jqllm_getconfig();
+    jv_free(a);
+    return ret;
+}
+
+static jv f_llm_model_1(jq_state *jq, jv input, jv a) {
+    jv_free(input);
+    jqllm_model m = new_model(a, jv_null());
+    return m;
+}
+
+static jv f_llm_model_2(jq_state *jq, jv input, jv a, jv b) {
+    jv_free(input);
+    jqllm_model m = new_model(a, b);
+    return m;
+}
+
+
 #define LIBM_DD(name) \
   {f_ ## name, #name, 1},
 #define LIBM_DD_NO(name) LIBM_DD(name)
@@ -1757,6 +1807,12 @@ BINOPS
   {f_now, "now", 1},
   {f_current_filename, "input_filename", 1},
   {f_current_line, "input_line_number", 1},
+  {f_llm_model_1, "llm_model", 2},
+  {f_llm_model_2, "llm_model", 3},
+  {f_llm_tokenize, "llm_tokenize", 3},
+  {f_llm_embed, "llm_embed", 3},
+  {f_llm_generate, "llm_generate", 1},
+  {f_llm_getconfig, "llm_getconfig", 1},
 };
 #undef LIBM_DDDD_NO
 #undef LIBM_DDD_NO
