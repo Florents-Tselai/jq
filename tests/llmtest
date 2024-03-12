@@ -1,0 +1,25 @@
+#!/bin/sh
+
+. "${0%/*}/setup" "$@"
+
+# Downloads
+
+export JQLLM_TESTVAR1="value1"
+export JQLLM_TESTVAR2="valuee"
+export JQLLM_MODEL_PATH="$JQTESTDIR/models"
+
+mkdir -p $JQLLM_MODEL_PATH 2>/dev/null
+
+if [ -f "$JQLLM_MODEL_PATH/stories15M.bin" ]; then
+    echo ""
+else
+    wget -P $JQLLM_MODEL_PATH https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin 1>&2 2>/dev/null
+fi
+
+if [ -f "$JQLLM_MODEL_PATH/tokenizer.bin" ]; then
+    echo ""
+else
+    wget -P $JQLLM_MODEL_PATH https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin 1>&2 2>/dev/null
+fi
+
+$VALGRIND $Q $JQ -L "$mods" --run-tests $JQTESTDIR/llm.test
