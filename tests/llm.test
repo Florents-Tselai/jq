@@ -2,8 +2,17 @@
 ########## Env Vars ##########
 
 
+# llm_getconfig
+
+llm_getconfig | .env.JQLLM_TESTVAR1
+null
+"value1"
+
 
 ########## Model Creation ##########
+# Arguments passed to llm_model are passed to user-facing functions
+# like generate, embed etc.
+#
 
 # llm_model
 llm_model("stories15M.bin").path == env.PWD + "/tests/models/stories15M.bin"
@@ -40,9 +49,4 @@ null
 ["hello world"]
 [true]
 
-# llm_getconfig
-
-llm_getconfig | .env.JQLLM_TESTVAR1
-null
-"value1"
 
