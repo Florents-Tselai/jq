@@ -7,7 +7,7 @@ LIBJQ_INCS = src/builtin.h src/bytecode.h src/compile.h                 \
         src/linker.h src/locfile.h src/opcode_list.h src/parser.y       \
         src/util.h src/decNumber/decContext.h src/decNumber/decNumber.h \
         src/decNumber/decNumberLocal.h src/jv_dtoa_tsd.h src/jv_thread.h \
-        ../../src/jqllm.h ../../src/llama2c.h \
+        ../../src/jqllm.h ../../src/vector.h ../../src/llama2c.h \
         src/jv_private.h
 
 LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
@@ -16,7 +16,7 @@ LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
         src/jv_unicode.c src/linker.c src/locfile.c src/util.c          \
         src/decNumber/decContext.c src/decNumber/decNumber.c            \
         src/jv_dtoa_tsd.c                                               \
-        ../../src/jqllm.c ../../src/llama2c.c \
+        ../../src/jqllm.c ../../src/vector.c ../../src/llama2c.c \
         ${LIBJQ_INCS}
 
 ### C build options
