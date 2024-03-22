@@ -1,4 +1,14 @@
-########## Vectors ##########
+#########################################################################################################
+#                                      HTTP
+#########################################################################################################
+
+#http_get | .url
+#"https://httpbin.org/anything"
+#"https://httpbin.org/anything"
+
+#########################################################################################################
+#                                      Vectors
+#########################################################################################################
 
 vector
 [1,2,3]
@@ -16,6 +26,10 @@ null
 null
 36.069377593742864
 
+[1,2,3,4] | l2_distance([11,22,33,43])
+null
+54.04627646748664
+
 [1,2,3,4] | dot_product([1,3,5,40])
 null
 182
@@ -28,7 +42,80 @@ null
 null
 0.8217730265940303
 
-########## Env Vars ##########
+# knn-search exact
+# `candidates | knn_search(v, k=1)`
+knn_search([1,2,3,4]; 1)
+[[1,2,3,4], [1,22,33,14], [12,23,34,45], [28,36,31,44]]
+[[1,2,3,4]]
+
+
+
+#########################################################################################################
+#                                      Python Basics
+#########################################################################################################
+
+pyupper
+"hello"
+"HELLO"
+
+#########################################################################################################
+#                                      tokenize: HF Transformers
+#########################################################################################################
+
+
+tokenize("hf-internal-testing/tiny-random-gpt2") | vector | ndims
+"hello there"
+4
+
+tokenize("hf-internal-testing/tiny-random-gpt2") | vector | ndims
+"the cat is still on the tree. waaaat? Άντε γειά!"
+37
+
+#########################################################################################################
+#                                      embed: HF Transformers
+#########################################################################################################
+
+# It looks like jq doesn't like too big arrays in expected output, hence we validate for ndims.
+
+embed("hf-internal-testing/tiny-random-gpt2") | vector | ndims
+"Hello"
+32
+
+embed("hf-internal-testing/tiny-random-gpt2") | vector | ndims
+"Lorem Ipsum"
+32
+
+#########################################################################################################
+#                                      prompt: llama2c
+#########################################################################################################
+
+[.[] | prompt("llam2c") | startswith("hello world")]
+["hello world"]
+[true]
+
+[.[] | prompt | startswith("hello world")]
+["hello world"]
+[true]
+
+
+#[.[] | llm_tokenize("tokenizer.bin"; 32000)]
+#["I believe the meaning of life is"]
+#[[1,306,4658,278,6593,310,2834,338]]
+
+#[.[] | llm_tokenize("tokenizer.bin"; 32000)]
+#["Simply put, the theory of relativity states that "]
+#[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
+
+#[.[] | llm_embed("tokenizer.bin"; 32000)]
+#["Simply put, the theory of relativity states that "]
+#[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
+
+# llm_generate
+
+
+#########################################################################################################
+#                                      env vars
+#########################################################################################################
 
 
 # llm_getconfig
@@ -38,7 +125,9 @@ null
 "value1"
 
 
-########## Model Creation ##########
+#########################################################################################################
+#                                       model creation
+#########################################################################################################
 # Arguments passed to llm_model are passed to user-facing functions
 # like generate, embed etc.
 #
@@ -56,26 +145,3 @@ true
 llm_model("stories15M.bin"; {"steps": 200}).params
 null
 { "temperature": 1, "topp": 0.9, "steps": 200, "rng_seed": 0}
-
-########## LLAMA2C ##########
-
-[.[] | llm_tokenize("tokenizer.bin"; 32000)]
-["I believe the meaning of life is"]
-[[1,306,4658,278,6593,310,2834,338]]
-
-[.[] | llm_tokenize("tokenizer.bin"; 32000)]
-["Simply put, the theory of relativity states that "]
-[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
-
-[.[] | llm_embed("tokenizer.bin"; 32000)]
-["Simply put, the theory of relativity states that "]
-[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
-
-# llm_generate
-
-# For lack of a better approach just check that it indeed generates a string starting with the prompt
-[.[] | llm_generate | startswith("hello world")]
-["hello world"]
-[true]
-
-

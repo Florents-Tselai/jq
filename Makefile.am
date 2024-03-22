@@ -7,7 +7,14 @@ LIBJQ_INCS = src/builtin.h src/bytecode.h src/compile.h                 \
         src/linker.h src/locfile.h src/opcode_list.h src/parser.y       \
         src/util.h src/decNumber/decContext.h src/decNumber/decNumber.h \
         src/decNumber/decNumberLocal.h src/jv_dtoa_tsd.h src/jv_thread.h \
-        ../../src/jqllm.h ../../src/vector.h ../../src/llama2c.h \
+        ../../src/spql.h ../../src/vector.h ../../src/llama2c.h          \
+        ../../src/prompt.h ../../src/embed.h ../../src/http.h \
+        ../../src/pyjq.h \
+        ../../src/cache.h \
+        ../../src/catalog.h \
+        ../../src/config.h \
+        ../../src/web.h \
+        ../../vendor/sqlite3/sqlite3.h ../../vendor/sqlite3/sqlite3ext.h \
         src/jv_private.h
 
 LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
@@ -16,7 +23,12 @@ LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
         src/jv_unicode.c src/linker.c src/locfile.c src/util.c          \
         src/decNumber/decContext.c src/decNumber/decNumber.c            \
         src/jv_dtoa_tsd.c                                               \
-        ../../src/jqllm.c ../../src/vector.c ../../src/llama2c.c \
+        ../../src/spql.c ../../src/vector.c ../../src/llama2c.c        \
+        ../../src/prompt.c ../../src/embed.c ../../src/http.c \
+        ../../src/pyjq.c \
+        ../../src/cache.c \
+        ../../src/web.c \
+        ../../vendor/sqlite3/sqlite3.c \
         ${LIBJQ_INCS}
 
 ### C build options

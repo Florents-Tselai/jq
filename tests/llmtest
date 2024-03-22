@@ -7,6 +7,7 @@ export JQLLM_TESTVAR2="valuee"
 export JQLLM_MODEL_PATH="$JQTESTDIR/models"
 export JQLLM_MODEL="stories15M.bin"
 export JQLLM_TOKENIZER="tokenizer.bin"
+export JQLLM_LLAMAFILE_HOST=127.0.0.1:8080
 
 mkdir -p $JQLLM_MODEL_PATH 2>/dev/null
 

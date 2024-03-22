@@ -58,7 +58,7 @@ void *alloca (size_t);
 #include "jv_dtoa_tsd.h"
 #include "jv_private.h"
 #include "util.h"
-#include "jqllm.h"
+#include "spql.h"
 
 
 #define BINOP(name) \
