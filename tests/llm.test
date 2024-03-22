@@ -71,6 +71,10 @@ tokenize("hf-internal-testing/tiny-random-gpt2") | vector | ndims
 "the cat is still on the tree. waaaat? Άντε γειά!"
 37
 
+tokenize| vector | ndims
+"the cat is still on the tree. waaaat? Άντε γειά!"
+37
+
 #########################################################################################################
 #                                      embed: HF Transformers
 #########################################################################################################
@@ -85,6 +89,10 @@ embed("hf-internal-testing/tiny-random-gpt2") | vector | ndims
 "Lorem Ipsum"
 32
 
+embed | vector | ndims
+"Lorem Ipsum"
+32
+
 #########################################################################################################
 #                                      prompt: llama2c
 #########################################################################################################
@@ -93,25 +101,10 @@ embed("hf-internal-testing/tiny-random-gpt2") | vector | ndims
 ["hello world"]
 [true]
 
+# no model provided / pick default
 [.[] | prompt | startswith("hello world")]
 ["hello world"]
 [true]
-
-
-#[.[] | llm_tokenize("tokenizer.bin"; 32000)]
-#["I believe the meaning of life is"]
-#[[1,306,4658,278,6593,310,2834,338]]
-
-#[.[] | llm_tokenize("tokenizer.bin"; 32000)]
-#["Simply put, the theory of relativity states that "]
-#[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
-
-#[.[] | llm_embed("tokenizer.bin"; 32000)]
-#["Simply put, the theory of relativity states that "]
-#[[1,3439,17632,1925,29892,278,6368,310,14215,537,5922,393, 29871]]
-
-# llm_generate
-
 
 #########################################################################################################
 #                                      env vars
