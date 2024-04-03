@@ -1,0 +1,77 @@
+#!/bin/bash
+
+. "${0%/*}/setup" "$@"
+
+export JQLLM_TESTVAR1="value1"
+export JQLLM_TESTVAR2="valuee"
+export JQLLM_MODEL_PATH="$JQTESTDIR/models"
+export JQLLM_MODEL="stories15M.bin"
+export JQLLM_TOKENIZER="tokenizer.bin"
+
+export LLAMAFILE_PROMPT_MODEL="phi-2.Q2_K.llamafile"
+export LLAMAFILE_PROMPTS_PORT=8080
+
+export LLAMAFILE_EMBEDDINGS_MODEL="nomic-embed-text-v1.5.f16.llamafile"
+export LLAMAFILE_EMBEDDINGS_PORT=8083
+
+mkdir -p $JQLLM_MODEL_PATH 2>/dev/null
+
+if [ -f "$JQLLM_MODEL_PATH/stories15M.bin" ]; then
+    echo ""
+else
+    wget -P $JQLLM_MODEL_PATH https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin 1>&2 2>/dev/null
+fi
+
+if [ -f "$JQLLM_MODEL_PATH/tokenizer.bin" ]; then
+    echo ""
+else
+    wget -P $JQLLM_MODEL_PATH https://github.com/karpathy/llama2.c/raw/master/tokenizer.bin 1>&2 2>/dev/null
+fi
+
+
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+function on_linux_amd64() {
+  if [ "$OS" = "Linux" ] && { [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; }; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function on_linux_arm64() {
+  if [ "$OS" = "Linux" ] && { [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; }; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Run basic tests on all platforms
+$VALGRIND $Q $JQ -L "$mods" --run-tests $JQTESTDIR/spql.test
+
+# gpt4all support is not available on linux_arm64
+if ! on_linux_arm64; then
+    $VALGRIND $Q $JQ -L "$mods" --run-tests $JQTESTDIR/spqlgpt4all.test
+fi
+
+if ! on_linux_amd64; then
+    ./models/phi-2.Q2_K.llamafile --nobrowser --port 8080 1>/dev/null 2>&1 &
+    llamafile_prompts_server_pid=$!
+
+    sleep 5 # wait a bit for the server to start
+    # Check if the server started properly
+    if curl --output /dev/null --silent --head --fail http://localhost:8080; then
+
+        # Your server is up and running, put your server-dependent commands here
+        $VALGRIND $Q $JQ -L "$mods" --run-tests $JQTESTDIR/spqlllamafile.test
+
+        # Once done, kill the server process
+        kill $llamafile_prompts_server_pid
+    else
+        echo "Error: Testing llamafile server did not start successfully."
+    fi
+fi
+
+

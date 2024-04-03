@@ -15,6 +15,10 @@ LIBJQ_INCS = src/builtin.h src/bytecode.h src/compile.h                 \
         ../../src/config.h \
         ../../src/web.h \
         ../../vendor/sqlite3/sqlite3.h ../../vendor/sqlite3/sqlite3ext.h \
+        ../../src/llamafile.h \
+        ../../src/spql_util.h \
+        ../../src/common.h \
+        ../../src/fmgr.h \
         src/jv_private.h
 
 LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
@@ -29,6 +33,8 @@ LIBJQ_SRC = src/builtin.c src/bytecode.c src/compile.c src/execute.c    \
         ../../src/cache.c \
         ../../src/web.c \
         ../../vendor/sqlite3/sqlite3.c \
+        ../../src/llamafile.c \
+        ../../src/spql_util.c \
         ${LIBJQ_INCS}
 
 ### C build options
@@ -157,7 +163,7 @@ endif
 
 ### Tests (make check)
 
-TESTS = tests/mantest tests/jqtest tests/shtest tests/utf8test tests/base64test tests/llmtest
+TESTS = tests/mantest tests/jqtest tests/shtest tests/utf8test tests/base64test tests/spqltest
 if !WIN32
 TESTS += tests/optionaltest
 endif

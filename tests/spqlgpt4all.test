@@ -1,0 +1,11 @@
+#########################################################################################################
+#                                      gpt4all
+#########################################################################################################
+
+"Tell me a story about flying spaghetti" | prompt("orca-mini-3b-gguf2-q4_0.gguf") |  length > 10
+null
+true
+
+"What is the capital of Greece?" | prompt("orca-mini-3b-gguf2-q4_0.gguf") | length > 10
+null
+true
