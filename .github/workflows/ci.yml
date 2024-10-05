@@ -35,8 +35,8 @@ jobs:
         include:
           - arch: amd64
             CC: x86_64-linux-gnu
-          - arch: arm64
-            CC: aarch64-linux-gnu
+#          - arch: arm64
+#            CC: aarch64-linux-gnu
 #          - arch: armel
 #            CC: arm-linux-gnueabi
 #          - arch: armhf
@@ -84,7 +84,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
-          sudo apt-get install -y curl libcurl4-openssl-dev libssl-dev
+          sudo apt-get install -y curl libcurl4-openssl-dev libssl-dev pkg-config
       - name: Build
         run: |
           autoreconf -i
@@ -96,9 +96,9 @@ jobs:
             --enable-static \
             --enable-all-static \
             CFLAGS="-O2 -pthread -fstack-protector-all" \
-            CPPFLAGS="$(curl-config --cflags)" \
-            LDFLAGS="$(curl-config --libs)" \
-            LIBS=-lcurl
+            CPPFLAGS="$(curl-config --cflags) $(pkg-config --cflags)" \
+            LDFLAGS="$(curl-config --libs) $(pkg-config --libs)" \
+            LIBS=-lcurl -lssl -lcrypto
           
           make -j"$(nproc)"
           file ./jq
