@@ -69,11 +69,11 @@ jobs:
 #            CC: s390x-linux-gnu
     runs-on: ubuntu-22.04
     env:
-      AR: ${{ matrix.CC }}-ar
-      CHOST: ${{ matrix.CC }}
-      CC: ${{ matrix.CC }}-gcc
-      CPP: ${{ matrix.CC }}-cpp
-      LDFLAGS: -s
+#      AR: ${{ matrix.CC }}-ar
+#      CHOST: ${{ matrix.CC }}
+#      CC: ${{ matrix.CC }}-gcc
+#      CPP: ${{ matrix.CC }}-cpp
+#      LDFLAGS: -s
       SUFFIX: linux-${{ matrix.arch }}
     steps:
       - name: Clone repository
@@ -83,7 +83,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
+          sudo apt-get install -y automake autoconf libtool build-essential
           sudo apt-get install -y libcurl4-gnutls-dev
 
       - name: configure
@@ -96,7 +96,6 @@ jobs:
           
           autoreconf -i
           ./configure \
-            --host=${{ matrix.CC }} \
             --disable-docs \
             --disable-valgrind \
             --with-oniguruma=builtin
@@ -109,10 +108,11 @@ jobs:
 
       - name: Test
         # Only run tests for amd64 matching the CI machine arch
-        if: ${{ matrix.arch == 'amd64' }}
+        #if: ${{ matrix.arch == 'amd64' }}
         run: |
           make check VERBOSE=yes
           git diff --exit-code
+
       - name: Upload Test Logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -122,6 +122,7 @@ jobs:
           path: |
             test-suite.log
             tests/*.log
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
