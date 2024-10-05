@@ -88,10 +88,10 @@ jobs:
       - name: Build
         run: |
           
-          export CFLAGS="-O2 -pthread -fstack-protector-all"
-          export CPPFLAGS="$(curl-config --cflags)"
-          export LDFLAGS="$(curl-config --libs)"
-          export LIBS="-lcurl"
+          CFLAGS="-O2 -pthread -fstack-protector-all"
+          CPPFLAGS="$(curl-config --cflags)"
+          LDFLAGS="$(curl-config --libs)"
+          LIBS="-lcurl"
           
           export 
           autoreconf -i
