@@ -37,8 +37,8 @@ jobs:
             CC: x86_64-linux-gnu
           - arch: arm64
             CC: aarch64-linux-gnu
-#          - arch: armel
-#            CC: arm-linux-gnueabi
+          - arch: armel
+            CC: arm-linux-gnueabi
 #          - arch: armhf
 #            CC: arm-linux-gnueabihf
 #          - arch: i386
