@@ -73,7 +73,10 @@ jobs:
       CHOST: ${{ matrix.CC }}
       CC: ${{ matrix.CC }}-gcc
       CPP: ${{ matrix.CC }}-cpp
-      LDFLAGS: -s
+      CFLAGS: "-O2 -pthread -fstack-protector-all"
+      CPPFLAGS: "$(curl-config --cflags)"
+      LDFLAGS: -s "$(curl-config --libs)"
+      LIBS: -lcurl
       SUFFIX: linux-${{ matrix.arch }}
     steps:
       - name: Clone repository
@@ -85,21 +88,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
           sudo apt-get install -y libcurl4-gnutls-dev
-      - name: Build
+
+      - name: configure
         run: |
           
-          CFLAGS="-O2 -pthread -fstack-protector-all"
-          CPPFLAGS="$(curl-config --cflags)"
-          LDFLAGS="$(curl-config --libs)"
-          LIBS="-lcurl"
-          
-          export 
+#          export CFLAGS="-O2 -pthread -fstack-protector-all"
+#          export CPPFLAGS="$(curl-config --cflags)"
+#          export LDFLAGS="$(curl-config --libs)"
+
           autoreconf -i
           ./configure \
             --host=${{ matrix.CC }} \
             --disable-docs \
             --disable-valgrind \
             --with-oniguruma=builtin
+
+      - name: make
           make -j"$(nproc)"
           file ./jq
           cp ./jq jq-${{ env.SUFFIX }}          
