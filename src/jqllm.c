@@ -5,6 +5,13 @@ typedef struct memory {
     size_t size;
 } memory;
 
+jv f_http_header_2(SPQL_FUNCTIONS_ARGS_2) {
+    jv_free(input);
+    assert(jv_get_kind(a) == JV_KIND_STRING && jv_get_kind(b) == JV_KIND_STRING);
+
+    return JV_ARRAY_2(a, b);
+}
+
 static size_t
 write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
     struct memory *mem = userp;
@@ -135,7 +142,6 @@ jv http_post(jv url, jv body, jv headers) {
     curl_easy_setopt(hnd, CURLOPT_FTP_SKIP_PASV_IP, 1L);
     curl_easy_setopt(hnd, CURLOPT_TCP_KEEPALIVE, 1L);
 
-    // Set callback function to receive data
     curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, _post_write_callback);
     curl_easy_setopt(hnd, CURLOPT_WRITEDATA, &response);
 
@@ -344,4 +350,64 @@ jv f_prompt_1(SPQL_FUNCTIONS_ARGS_1) {
 
 jv f_prompt_0(SPQL_FUNCTIONS_ARGS_0) {
     return f_prompt_1(jq, input, jv_string(JQLLM_DEFAULT_GENERATE_MODEL));
+}
+
+jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
+    assert(jv_get_kind(a)== JV_KIND_STRING);
+    assert(jv_get_kind(b) == JV_KIND_STRING);
+    assert(jv_get_kind(c) == JV_KIND_ARRAY);
+    assert(jv_get_kind(d) == JV_KIND_STRING);
+    assert( (jv_get_kind(input) == JV_KIND_OBJECT));
+
+    jv body = input;
+    const char *body_str = jv_string_value(jv_dump_string(body, 0));
+    size_t payload_size = strlen(body_str);
+
+    const char *url = jv_string_value(b);
+
+    jv res = jv_null();
+
+    char *response = NULL;
+
+    struct curl_slist *headers_list = NULL;
+
+    headers_list = curl_slist_append(headers_list, "Content-Type: application/json");
+
+    CURL *easy = curl_easy_init();
+    curl_easy_setopt(easy, CURLOPT_BUFFERSIZE, 102400L);
+    curl_easy_setopt(easy, CURLOPT_URL, url);
+    curl_easy_setopt(easy, CURLOPT_NOPROGRESS, 1L);
+
+
+    curl_easy_setopt(easy, CURLOPT_HTTPHEADER, headers_list);
+    curl_easy_setopt(easy, CURLOPT_USERAGENT, DEFAULT_USERAGENT);
+    curl_easy_setopt(easy, CURLOPT_MAXREDIRS, 50L);
+    curl_easy_setopt(easy, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
+    curl_easy_setopt(easy, CURLOPT_FTP_SKIP_PASV_IP, 1L);
+    curl_easy_setopt(easy, CURLOPT_TCP_KEEPALIVE, 1L);
+
+    curl_easy_setopt(easy, CURLOPT_POSTFIELDS, body_str);
+    curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
+
+    // Set callback function to receive data
+    curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, _post_write_callback);
+    curl_easy_setopt(easy, CURLOPT_WRITEDATA, &response);
+
+    CURLcode curl_code = curl_easy_perform(easy);
+
+    if (curl_code == CURLE_OK) {
+        res = jv_parse(response);
+    } else {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(curl_code));
+    }
+
+    free(response);
+    curl_easy_cleanup(easy);
+    curl_slist_free_all(headers_list);
+    jv_free(a);
+    jv_free(b);
+    jv_free(c);
+    jv_free(d);
+
+    return res;
 }

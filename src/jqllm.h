@@ -80,6 +80,7 @@ typedef enum {
     HTTP_PATCH,
     HTTP_UNKNOWN
 } http_method;
+
 //
 ///* Components (and postitions) of the http_request tuple type */
 //enum {
@@ -117,6 +118,7 @@ typedef struct {
     http_curlopt_type curlopt_type;
     bool superuser_only;
 } http_curlopt;
+
 //
 //
 ///* CURLOPT values we allow user to set at run-time */
@@ -167,7 +169,6 @@ typedef struct {
 //#endif
 //        { NULL, NULL, 0, 0, false } /* Array null terminator */
 //};
-
 
 
 #define VECTOR_MAX_DIM 16000
@@ -222,14 +223,16 @@ typedef enum {
 } KNN_ALGO;
 
 
-
-/* knn */
-jv knn_search(jv candidates, vector v, int k, DISTANCE_MEASURE measure, KNN_ALGO algo);
+jv f_http_header_2(SPQL_FUNCTIONS_ARGS_2);
 
 jv f_http_get(SPQL_FUNCTIONS_ARGS_0);
 
 jv f_http_post_2(SPQL_FUNCTIONS_ARGS_2);
 
+jv f_http_4(SPQL_FUNCTIONS_ARGS_4);
+
+/* knn */
+jv knn_search(jv candidates, vector v, int k, DISTANCE_MEASURE measure, KNN_ALGO algo);
 
 jv f_vector_init(SPQL_FUNCTIONS_ARGS_0);
 
@@ -249,6 +252,7 @@ jv f_vector_knn_search_2(SPQL_FUNCTIONS_ARGS_2);
 
 
 jv f_prompt_1(SPQL_FUNCTIONS_ARGS_1);
+
 jv f_prompt_0(SPQL_FUNCTIONS_ARGS_0);
 
 #define VECTOR_OPERATIONS \
@@ -262,6 +266,8 @@ JQLLM_BUILTIN_FUNC(f_vector_cosine_similarity,  "cosine_similarity",    FUNC_NAR
 JQLLM_BUILTIN_FUNC(f_vector_knn_search_2,       "knn_search",           FUNC_NARGS_2)
 
 #define HTTP_OPERATIONS \
+    JQLLM_BUILTIN_FUNC(f_http_4,                    "http",                 FUNC_NARGS_4), \
+    JQLLM_BUILTIN_FUNC(f_http_header_2,             "http_header",          FUNC_NARGS_2), \
     JQLLM_BUILTIN_FUNC(f_http_get,                  "http_get",             FUNC_NARGS_0), \
     JQLLM_BUILTIN_FUNC(f_http_post_2,               "http_post",            FUNC_NARGS_2)
 
@@ -276,8 +282,10 @@ HTTP_OPERATIONS, \
 PROMPT_FUNCTIONS
 
 jv __jq_http_get(const char *url);
+
 jv __jq_http_post(const char *url);
 
 jv http_post(jv url, jv body, jv headers);
+
 
 #endif
