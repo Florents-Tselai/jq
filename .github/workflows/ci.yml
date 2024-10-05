@@ -96,8 +96,8 @@ jobs:
             --enable-static \
             --enable-all-static \
             CFLAGS="-O2 -pthread -fstack-protector-all" \
-            CPPFLAGS="$(curl-config --cflags) $(pkg-config --cflags)" \
-            LDFLAGS="$(curl-config --libs) $(pkg-config --libs)" \
+            CPPFLAGS="$(curl-config --cflags) $(pkg-config --cflags ssl)" \
+            LDFLAGS="$(curl-config --libs) $(pkg-config --libs ssl)" \
             LIBS="-lcurl -lssl -lcrypto"
           
           make -j"$(nproc)"
