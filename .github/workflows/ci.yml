@@ -73,10 +73,7 @@ jobs:
       CHOST: ${{ matrix.CC }}
       CC: ${{ matrix.CC }}-gcc
       CPP: ${{ matrix.CC }}-cpp
-      CFLAGS: "-O2 -pthread -fstack-protector-all"
-      CPPFLAGS: "$(curl-config --cflags)"
-      LDFLAGS: -s "$(curl-config --libs)"
-      LIBS: -lcurl
+#      LDFLAGS: -s
       SUFFIX: linux-${{ matrix.arch }}
     steps:
       - name: Clone repository
@@ -92,10 +89,11 @@ jobs:
       - name: configure
         run: |
           
-#          export CFLAGS="-O2 -pthread -fstack-protector-all"
-#          export CPPFLAGS="$(curl-config --cflags)"
-#          export LDFLAGS="$(curl-config --libs)"
-
+          export CFLAGS="-O2 -pthread -fstack-protector-all"
+          export CPPFLAGS="$(curl-config --cflags)"
+          export LDFLAGS="-s $(curl-config --libs)"
+          export LIBS="-lcurl"
+          
           autoreconf -i
           ./configure \
             --host=${{ matrix.CC }} \
