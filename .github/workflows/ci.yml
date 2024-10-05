@@ -98,7 +98,7 @@ jobs:
             CFLAGS="-O2 -pthread -fstack-protector-all" \
             CPPFLAGS="$(curl-config --cflags) $(pkg-config --cflags)" \
             LDFLAGS="$(curl-config --libs) $(pkg-config --libs)" \
-            LIBS=-lcurl -lssl -lcrypto
+            LIBS="-lcurl -lssl -lcrypto"
           
           make -j"$(nproc)"
           file ./jq
