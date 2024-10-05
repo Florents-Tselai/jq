@@ -357,7 +357,6 @@ jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
     assert(jv_get_kind(b) == JV_KIND_STRING);
     assert(jv_get_kind(c) == JV_KIND_ARRAY);
     assert(jv_get_kind(d) == JV_KIND_STRING);
-    assert( (jv_get_kind(input) == JV_KIND_OBJECT));
 
     jv body = input;
     const char *body_str = jv_string_value(jv_dump_string(body, 0));
@@ -386,8 +385,10 @@ jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
     curl_easy_setopt(easy, CURLOPT_FTP_SKIP_PASV_IP, 1L);
     curl_easy_setopt(easy, CURLOPT_TCP_KEEPALIVE, 1L);
 
-    curl_easy_setopt(easy, CURLOPT_POSTFIELDS, body_str);
-    curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
+    if (strcmp(jv_string_value(a), "POST") == 0) {
+        curl_easy_setopt(easy, CURLOPT_POSTFIELDS, body_str);
+        curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
+    }
 
     // Set callback function to receive data
     curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, _post_write_callback);
