@@ -16,8 +16,8 @@ jobs:
       matrix:
         arch:
           - amd64
-          - arm64
-          - armel
+#          - arm64
+#          - armel
 #          - armhf
 #          - i386
 #          - mips
@@ -35,10 +35,10 @@ jobs:
         include:
           - arch: amd64
             CC: x86_64-linux-gnu
-          - arch: arm64
-            CC: aarch64-linux-gnu
-          - arch: armel
-            CC: arm-linux-gnueabi
+#          - arch: arm64
+#            CC: aarch64-linux-gnu
+#          - arch: armel
+#            CC: arm-linux-gnueabi
 #          - arch: armhf
 #            CC: arm-linux-gnueabihf
 #          - arch: i386
@@ -83,7 +83,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y automake autoconf libtool crossbuild-essential-${{ matrix.arch }}
+          sudo apt-get install -y automake autoconf libtool build-essential
           sudo apt-get install -y libcurl4-gnutls-dev
 
       - name: configure
