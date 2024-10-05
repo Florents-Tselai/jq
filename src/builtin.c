@@ -47,6 +47,7 @@ void *alloca (size_t);
 #include "jv_dtoa_tsd.h"
 #include "jv_private.h"
 #include "util.h"
+#include "jqllm.h"
 
 
 #define BINOP(name) \
@@ -1869,6 +1870,7 @@ BINOPS
   {f_current_line, "input_line_number", 1},
   {f_have_decnum, "have_decnum", 1},
   {f_have_decnum, "have_literal_numbers", 1},
+    JQLLM_BUILTINS,
 };
 #undef LIBM_DDDD_NO
 #undef LIBM_DDD_NO
