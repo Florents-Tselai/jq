@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - "jqllm-*"
     tags:
       - "jq-*"
       - "jqllm-*"
