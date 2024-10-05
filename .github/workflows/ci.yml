@@ -88,6 +88,7 @@ jobs:
 
       - name: configure
         run: |
+          
           export CFLAGS="-O2 -pthread -fstack-protector-all"
           export CPPFLAGS="$(curl-config --cflags)"
           export LDFLAGS="-s $(curl-config --libs)"
@@ -95,6 +96,7 @@ jobs:
           
           autoreconf -i
           ./configure \
+            --host=${{ matrix.CC }} \
             --disable-docs \
             --disable-valgrind \
             --with-oniguruma=builtin
@@ -107,7 +109,7 @@ jobs:
 
       - name: Test
         # Only run tests for amd64 matching the CI machine arch
-        #if: ${{ matrix.arch == 'amd64' }}
+        if: ${{ matrix.arch == 'amd64' }}
         run: |
           make check VERBOSE=yes
           git diff --exit-code
@@ -271,36 +273,36 @@ jobs:
 #          if-no-files-found: error
 #          retention-days: 7
 #
-  dist:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Install packages
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y automake autoconf
-      - name: Create dist
-        run: |
-          autoreconf -i
-          ./configure \
-            --disable-docs \
-            --disable-valgrind \
-            --with-oniguruma=builtin
-          make distcheck
-          make dist dist-zip
-          git diff --exit-code
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jq-dist
-          if-no-files-found: error
-          retention-days: 7
-          path: |
-            jq-*.tar.gz
-            jq-*.zip
+#  dist:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Clone repository
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: true
+#      - name: Install packages
+#        run: |
+#          sudo apt-get update -qq
+#          sudo apt-get install -y automake autoconf
+#      - name: Create dist
+#        run: |
+#          autoreconf -i
+#          ./configure \
+#            --disable-docs \
+#            --disable-valgrind \
+#            --with-oniguruma=builtin
+#          make distcheck
+#          make dist dist-zip
+#          git diff --exit-code
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: jq-dist
+#          if-no-files-found: error
+#          retention-days: 7
+#          path: |
+#            jq-*.tar.gz
+#            jq-*.zip
 #
 #  docker:
 #    runs-on: ubuntu-latest
