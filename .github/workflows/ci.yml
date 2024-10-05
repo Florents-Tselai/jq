@@ -73,7 +73,7 @@ jobs:
       CHOST: ${{ matrix.CC }}
       CC: ${{ matrix.CC }}-gcc
       CPP: ${{ matrix.CC }}-cpp
-#      LDFLAGS: -s
+      LDFLAGS: -s
       SUFFIX: linux-${{ matrix.arch }}
     steps:
       - name: Clone repository
@@ -102,6 +102,7 @@ jobs:
             --with-oniguruma=builtin
 
       - name: make
+        run: |
           make -j"$(nproc)"
           file ./jq
           cp ./jq jq-${{ env.SUFFIX }}          
