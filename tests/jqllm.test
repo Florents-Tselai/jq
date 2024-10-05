@@ -2,10 +2,6 @@
 #                                      HTTP
 #########################################################################################################
 
-. | http_header("Content-Type"; "application/json")
-"input ignored"
-["Content-Type", "application/json"]
-
 http("POST"; "https://httpbin.org/anything"; [["Content-Type", "application/json"]]; "application/json") | .json
 {"k1": "v1", "k2": "v2"}
 {"k1":"v1","k2":"v2"}
@@ -18,9 +14,9 @@ http_get | .url
 "https://httpbin.org/anything"
 "https://httpbin.org/anything"
 
-{"k1": "v1", "k2": "v2"} | http_post("https://httpbin.org/anything"; {"h1": "v1", "h2": "v2"}) | .json
-null
-{"k1": "v1", "k2": "v2"}
+http_post("https://httpbin.org/anything") | .json
+"Hello World!"
+"Hello World!"
 
 #########################################################################################################
 #                                      Ollama Generate

@@ -266,10 +266,7 @@ JQLLM_BUILTIN_FUNC(f_vector_cosine_similarity,  "cosine_similarity",    FUNC_NAR
 JQLLM_BUILTIN_FUNC(f_vector_knn_search_2,       "knn_search",           FUNC_NARGS_2)
 
 #define HTTP_OPERATIONS \
-    JQLLM_BUILTIN_FUNC(f_http_4,                    "http",                 FUNC_NARGS_4), \
-    JQLLM_BUILTIN_FUNC(f_http_header_2,             "http_header",          FUNC_NARGS_2), \
-    JQLLM_BUILTIN_FUNC(f_http_get,                  "http_get",             FUNC_NARGS_0), \
-    JQLLM_BUILTIN_FUNC(f_http_post_2,               "http_post",            FUNC_NARGS_2)
+    JQLLM_BUILTIN_FUNC(f_http_4,                    "http",                 FUNC_NARGS_4)
 
 
     #define PROMPT_FUNCTIONS \

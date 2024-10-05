@@ -390,7 +390,11 @@ jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
         curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
     }
 
-    // Set callback function to receive data
+    if (strcmp(jv_string_value(a), "GET") == 0) {
+        /* GET is the default for curl */
+    }
+
+
     curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, _post_write_callback);
     curl_easy_setopt(easy, CURLOPT_WRITEDATA, &response);
 

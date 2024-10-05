@@ -281,3 +281,9 @@ def IN(s): any(s == .; .);
 def IN(src; s): any(src == s; .);
 
 # jqllm
+
+def http_get:
+    http("GET"; .; [["Content-Type", "application/json"]]; "application/json");
+
+def http_post(url):
+    . | http("POST"; url; [["Content-Type", "application/json"]]; "application/json");
