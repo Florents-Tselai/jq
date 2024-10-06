@@ -22,15 +22,21 @@ http_post("https://httpbin.org/anything") | .json
 #                                      Ollama Generate
 #########################################################################################################
 
-generate
-"hello"
-{"prompt":"hello","model":"string","stream":false}
+#### Generate
 
-generate("llama2c")
-"hello"
-{"prompt":"hello","model":"string","stream":false}
+__ollama_make_generate_payload("llama3.2")
+"Why is the sky blue?"
+{ "model": "llama3.2", "prompt": "Why is the sky blue?", "stream": false }
 
-### echo '"hellodfg"' | ./jq 'generate("llama3.2")' | curl -d@- http://localhost:11434/api/generate | jq
+#### Embed one
+__ollama_make_embed_payload("all-minilm")
+"Why is the sky blue?"
+{ "model": "all-minilm", "input": ["Why is the sky blue?"] }
+
+### Embed multi
+__ollama_make_embed_payload("all-minilm")
+["Why is the sky blue?", "Why is the grass green?"]
+{ "model": "all-minilm", "input": ["Why is the sky blue?", "Why is the grass green?"] }
 
 #########################################################################################################
 #                                      Vector Operations

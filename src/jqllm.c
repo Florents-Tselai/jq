@@ -409,10 +409,5 @@ jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
     free(response);
     curl_easy_cleanup(easy);
     curl_slist_free_all(headers_list);
-    jv_free(a);
-    jv_free(b);
-    jv_free(c);
-    jv_free(d);
-
     return res;
 }

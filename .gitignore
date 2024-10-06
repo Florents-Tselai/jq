@@ -60,3 +60,4 @@ jq.dSYM
 .idea
 build/
 local/
+jqllm

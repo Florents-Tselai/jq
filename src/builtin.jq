@@ -287,3 +287,28 @@ def http_get:
 
 def http_post(url):
     . | http("POST"; url; [["Content-Type", "application/json"]]; "application/json");
+
+# https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-completion
+
+def __ollama_make_generate_payload(model):
+    { "model": model, "prompt": . , "stream": false };
+
+def ollama_generate(model):
+    .
+    | __ollama_make_generate_payload(model)
+    | http_post("http://localhost:11434/api/generate")
+    | .response
+    ;
+
+def __ollama_make_embed_payload(model):
+  if type == "array"
+  then { "model": model, "input": . }
+  else { "model": model, "input": [ . ] }
+  end;
+
+def ollama_embed(model):
+    .
+    | __ollama_make_embed_payload(model)
+    | http_post("http://localhost:11434/api/embed")
+    | .embeddings
+    ;
