@@ -1,174 +1,7 @@
 #include "jqllm.h"
 
-typedef struct memory {
-    char *ptr;
-    size_t size;
-} memory;
-
-jv f_http_header_2(SPQL_FUNCTIONS_ARGS_2) {
-    jv_free(input);
-    assert(jv_get_kind(a) == JV_KIND_STRING && jv_get_kind(b) == JV_KIND_STRING);
-
-    return JV_ARRAY_2(a, b);
-}
-
-static size_t
-write_cb(void *contents, size_t size, size_t nmemb, void *userp) {
-    struct memory *mem = userp;
-    size_t realsize = size * nmemb;
-    char *ptr = realloc(mem->ptr, mem->size + realsize + 1);
-    if (!ptr) {
-        fprintf(stderr, "not enough memory\n");
-        return 0;
-    }
-
-    mem->ptr = ptr;
-    memcpy(&mem->ptr[mem->size], contents, realsize);
-    mem->size += realsize;
-    mem->ptr[mem->size] = 0;
-
-    return realsize;
-}
-
-jv __jq_http_get(const char *url) {
-    jv res = jv_null();
-
-    CURL *easy;
-    CURLcode curl_code;
-    struct memory chunk;
-
-    chunk.ptr = malloc(1); /* grown as needed */
-    chunk.size = 0;
-
-    curl_global_init(CURL_GLOBAL_ALL);
-
-    easy = curl_easy_init();
-
-    curl_easy_setopt(easy, CURLOPT_URL, url);
-    curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, write_cb);
-    curl_easy_setopt(easy, CURLOPT_WRITEDATA, (void *)&chunk);
-    curl_easy_setopt(easy, CURLOPT_USERAGENT, "jqllm");
-
-    curl_code = curl_easy_perform(easy);
-
-    if (curl_code == CURLE_OK)
-        res = jv_parse(chunk.ptr);
-
-    curl_easy_cleanup(easy);
-
-    curl_global_cleanup();
-
-    return res;
-}
-
-jv __jq_http_post(const char *url) {
-    jv res = jv_null();
 
 
-    CURL *easy;
-    CURLcode curl_code;
-    struct memory chunk;
-
-    chunk.ptr = malloc(1); /* grown as needed */
-    chunk.size = 0;
-
-    curl_global_init(CURL_GLOBAL_ALL);
-
-    easy = curl_easy_init();
-
-    curl_easy_setopt(easy, CURLOPT_URL, url);
-    curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, write_cb);
-    curl_easy_setopt(easy, CURLOPT_WRITEDATA, (void *)&chunk);
-    curl_easy_setopt(easy, CURLOPT_USERAGENT, "jqllm");
-
-    curl_code = curl_easy_perform(easy);
-
-    if (curl_code == CURLE_OK)
-        res = jv_parse(chunk.ptr);
-
-    curl_easy_cleanup(easy);
-
-    curl_global_cleanup();
-
-    return res;
-}
-
-
-// Callback function to write received data
-size_t _post_write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
-    size_t realsize = size * nmemb;
-    char **response_ptr = (char **) userdata;
-
-    // Allocate memory for response data
-    *response_ptr = (char *) realloc(*response_ptr, realsize + 1);
-    if (*response_ptr == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return 0; // Returning 0 indicates failure
-    }
-
-    // Copy received data to the response buffer
-    memcpy(*response_ptr, ptr, realsize);
-    (*response_ptr)[realsize] = '\0'; // Null-terminate the string
-
-    return realsize;
-}
-
-jv http_post(jv url, jv body, jv headers) {
-    jv res = jv_null();
-
-    const char *body_str = jv_string_value(jv_dump_string(body, 0));
-    size_t payload_size = strlen(body_str);
-
-    CURLcode curl_code;
-    CURL *hnd;
-    struct curl_slist *headers_list;
-    char *response = NULL;
-
-    headers_list = NULL;
-
-    headers_list = curl_slist_append(headers_list, "Content-Type: aplication/json");
-
-
-    hnd = curl_easy_init();
-    curl_easy_setopt(hnd, CURLOPT_BUFFERSIZE, 102400L);
-    curl_easy_setopt(hnd, CURLOPT_URL, jv_string_value(url));
-    curl_easy_setopt(hnd, CURLOPT_NOPROGRESS, 1L);
-    curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, body_str);
-    curl_easy_setopt(hnd, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
-    curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers_list);
-    curl_easy_setopt(hnd, CURLOPT_USERAGENT, DEFAULT_USERAGENT);
-    curl_easy_setopt(hnd, CURLOPT_MAXREDIRS, 50L);
-    curl_easy_setopt(hnd, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
-    curl_easy_setopt(hnd, CURLOPT_FTP_SKIP_PASV_IP, 1L);
-    curl_easy_setopt(hnd, CURLOPT_TCP_KEEPALIVE, 1L);
-
-    curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, _post_write_callback);
-    curl_easy_setopt(hnd, CURLOPT_WRITEDATA, &response);
-
-    curl_code = curl_easy_perform(hnd);
-
-    if (curl_code == CURLE_OK) {
-        res = jv_parse(response);
-    } else {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(curl_code));
-    }
-
-    free(response);
-    curl_easy_cleanup(hnd);
-    curl_slist_free_all(headers_list);
-
-    return res;
-}
-
-jv f_http_get(SPQL_FUNCTIONS_ARGS_0) {
-    return __jq_http_get(jv_string_value(input));
-}
-
-jv f_http_post_2(SPQL_FUNCTIONS_ARGS_2) {
-    return http_post(a, input, b);
-}
-
-#include "math.h"
 
 int is_valid_vector(jv i) {
     /* TODO: also validate it's an array of numbers*/
@@ -326,31 +159,30 @@ jv f_vector_knn_search_2(SPQL_FUNCTIONS_ARGS_2) {
     return knn_search(candidates, v, 1, L2_DISTANCE, EXACT);
 }
 
-#define JQLLM_DEFAULT_GENERATE_MODEL "llama3.2"
 
-jv f_prompt_1(SPQL_FUNCTIONS_ARGS_1) {
-    const char *prompt = jv_string_value(input);
-    const char *model = jv_string_value(a);
 
-    // jv request = jv_object();
+typedef struct {
+    char *buf;
+    size_t size;
+} memory;
 
-    /* See https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-completion*/
+size_t grow_buffer(void *contents, size_t sz, size_t nmemb, void *ctx) {
+    size_t realsize = sz * nmemb;
+    memory *mem = (memory *) ctx;
 
-    jv request = JV_OBJECT(jv_string("prompt"), input,
-                           jv_string("model"), jv_string("string"),
-                           jv_string("stream"), jv_false()
-    );
-    // request = jv_object_set(request, jv_string("prompt"), input);
-    // request = jv_object_set(request, jv_string("model"), a);
-    // request = jv_object_set(request, jv_string("stream"), jv_false());
-
-    // return jv_dump_string(request, 0);
-    return request;
+    // Attempt to realloc with extra space to reduce frequent realloc calls
+    char *ptr = realloc(mem->buf, mem->size + realsize + 4096);  // Adding extra space for larger responses
+    if (!ptr) {
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+    mem->buf = ptr;
+    memcpy(&(mem->buf[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->buf[mem->size] = 0; // Ensure null-termination of the buffer
+    return realsize;
 }
 
-jv f_prompt_0(SPQL_FUNCTIONS_ARGS_0) {
-    return f_prompt_1(jq, input, jv_string(JQLLM_DEFAULT_GENERATE_MODEL));
-}
 
 jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
     assert(jv_get_kind(a)== JV_KIND_STRING);
@@ -360,54 +192,44 @@ jv f_http_4(SPQL_FUNCTIONS_ARGS_4) {
 
     jv body = input;
     const char *body_str = jv_string_value(jv_dump_string(body, 0));
-    size_t payload_size = strlen(body_str);
 
     const char *url = jv_string_value(b);
 
     jv res = jv_null();
 
-    char *response = NULL;
 
     struct curl_slist *headers_list = NULL;
 
     headers_list = curl_slist_append(headers_list, "Content-Type: application/json");
 
     CURL *easy = curl_easy_init();
-    curl_easy_setopt(easy, CURLOPT_BUFFERSIZE, 102400L);
     curl_easy_setopt(easy, CURLOPT_URL, url);
-    curl_easy_setopt(easy, CURLOPT_NOPROGRESS, 1L);
-
 
     curl_easy_setopt(easy, CURLOPT_HTTPHEADER, headers_list);
-    curl_easy_setopt(easy, CURLOPT_USERAGENT, DEFAULT_USERAGENT);
-    curl_easy_setopt(easy, CURLOPT_MAXREDIRS, 50L);
-    curl_easy_setopt(easy, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
-    curl_easy_setopt(easy, CURLOPT_FTP_SKIP_PASV_IP, 1L);
-    curl_easy_setopt(easy, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(easy, CURLOPT_TIMEOUT, 1200L);   // Increase timeout
+    curl_easy_setopt(easy, CURLOPT_BUFFERSIZE, 102400L);  // Increase buffer size
 
-    if (strcmp(jv_string_value(a), "POST") == 0) {
+
+    if (strcmp(jv_string_value(a), "POST") == 0)
         curl_easy_setopt(easy, CURLOPT_POSTFIELDS, body_str);
-        curl_easy_setopt(easy, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)payload_size);
-    }
 
-    if (strcmp(jv_string_value(a), "GET") == 0) {
-        /* GET is the default for curl */
-    }
-
-
-    curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, _post_write_callback);
-    curl_easy_setopt(easy, CURLOPT_WRITEDATA, &response);
+    memory *mem = malloc(sizeof(memory));
+    mem->size = 0;
+    mem->buf = malloc(1);
+    curl_easy_setopt(easy, CURLOPT_WRITEFUNCTION, grow_buffer);
+    curl_easy_setopt(easy, CURLOPT_WRITEDATA, mem);
 
     CURLcode curl_code = curl_easy_perform(easy);
 
     if (curl_code == CURLE_OK) {
-        res = jv_parse(response);
+        res = jv_parse_sized(mem->buf, mem->size);
     } else {
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(curl_code));
     }
 
-    free(response);
     curl_easy_cleanup(easy);
     curl_slist_free_all(headers_list);
+    free(mem->buf);
+    free(mem);
     return res;
 }

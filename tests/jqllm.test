@@ -6,6 +6,10 @@ http("POST"; "https://httpbin.org/anything"; [["Content-Type", "application/json
 {"k1": "v1", "k2": "v2"}
 {"k1":"v1","k2":"v2"}
 
+http("POST"; "https://httpbin.org/anything"; [["Content-Type", "application/json"]]; "application/json") | .json
+["a", "b", "c"]
+["a", "b", "c"]
+
 http("GET"; "https://httpbin.org/anything"; [["Content-Type", "application/json"]]; "application/json") | .method
 "ignored"
 "GET"
@@ -27,6 +31,12 @@ http_post("https://httpbin.org/anything") | .json
 __ollama_make_generate_payload("llama3.2")
 "Why is the sky blue?"
 { "model": "llama3.2", "prompt": "Why is the sky blue?", "stream": false }
+
+
+__ollama_make_generate_payload("llama3.2") | http_post("http://localhost:11434/api/generate") | {model, done, done_reason}
+"Tell me a story"
+{ "model": "llama3.2", "done": true, "done_reason": "stop" }
+
 
 #### Embed one
 __ollama_make_embed_payload("all-minilm")
